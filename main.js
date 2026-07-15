@@ -31,7 +31,7 @@ async function fetchAI() {
     });
 
     const raw = await res.text();
-    console.log("RAW:", raw);
+    console.log("后端原始返回：", raw);
     if (!raw.trim()) throw new Error("后端无返回数据");
     const data = JSON.parse(raw);
     if (data.error) throw new Error(data.error);
