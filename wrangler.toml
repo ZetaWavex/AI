@@ -1,0 +1,13 @@
+name = "ai"
+main = "worker.js"
+compatibility_date = "2026-07-15"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[assets]
+directory = "."
+
+[ai]
+binding = "AI"

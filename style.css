@@ -1,0 +1,68 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+body {
+  background: #0f172a;
+  color: #fff;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+h1 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #38bdf8;
+}
+#chatBox {
+  height: 60vh;
+  overflow-y: auto;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: #1e293b;
+}
+.msg {
+  margin: 10px 0;
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  line-height: 1.5;
+}
+.user {
+  margin-left: auto;
+  background: #0284c7;
+}
+.ai {
+  margin-right: auto;
+  background: #334155;
+}
+.inputWrap {
+  display: flex;
+  gap: 10px;
+}
+#promptInput {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: #334155;
+  color: #fff;
+}
+#sendBtn {
+  padding: 0 24px;
+  border: none;
+  border-radius: 8px;
+  background: #0284c7;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+}
+#sendBtn:active {
+  opacity: 0.8;
+}
