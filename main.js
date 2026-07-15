@@ -3,12 +3,10 @@ const chatBox = document.getElementById("chatBox");
 const input = document.getElementById("promptInput");
 const sendBtn = document.getElementById("sendBtn");
 
-// 对话历史，内置AI人设
 let messagesHistory = [
   { role: "system", content: "你是中文AI助手，回答简洁易懂" }
 ];
 
-// 渲染聊天气泡
 function addMsg(text, isUser) {
   const div = document.createElement("div");
   div.className = `msg ${isUser ? "user" : "ai"}`;
@@ -17,7 +15,6 @@ function addMsg(text, isUser) {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// 发送请求函数，增加文本容错，解决空返回报错
 async function fetchAI() {
   const userText = input.value.trim();
   if (!userText) return;
@@ -33,7 +30,6 @@ async function fetchAI() {
       body: JSON.stringify({ chatMessages: messagesHistory })
     });
 
-    // 先读取原始文本，避免JSON解析崩溃
     const rawText = await res.text();
     if (!rawText) throw new Error("后端无返回数据");
     const data = JSON.parse(rawText);
@@ -46,6 +42,5 @@ async function fetchAI() {
   }
 }
 
-// 绑定点击、回车发送
 sendBtn.addEventListener("click", fetchAI);
 input.addEventListener("keydown", e => e.key === "Enter" && fetchAI());
