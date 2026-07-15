@@ -5,44 +5,33 @@ export default {
       "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type"
     };
+    const url = new URL(request.url);
 
-    // OPTIONS预检固定返回JSON
     if (request.method === "OPTIONS") {
-      return Response.json({ok: true}, {headers: corsHeaders});
+      return Response.json({ ok: true }, { headers: corsHeaders });
     }
 
-    // GET静态页面，POST才走AI接口
-    if (request.method !== "POST") {
-      return env.ASSETS.fetch(request);
-    }
-
-    // 检测AI绑定是否存在
-    if (!env.AI) {
-      return Response.json({error: "AI绑定未生效，请检查wrangler.toml配置并重新部署"}, {status:500, headers:corsHeaders});
-    }
-
-    try {
-      let payload;
+    // 仅 /api 作为AI接口
+    if (url.pathname === "/api" && request.method === "POST") {
+      if (!env.AI) {
+        return Response.json({ error: "AI绑定缺失" }, { status: 500, headers: corsHeaders });
+      }
       try {
-        payload = await request.json();
-      } catch (parseErr) {
-        return Response.json({error: "请求体不是合法JSON"}, {status:400, headers:corsHeaders});
+        const body = await request.json();
+        if (!Array.isArray(body.chatMessages)) {
+          return Response.json({ error: "参数缺失" }, { status: 400, headers: corsHeaders });
+        }
+        const aiResult = await env.AI.run("@cf/meta/llama-3-8b-instruct-fast", {
+          messages: body.chatMessages,
+          max_tokens: 200
+        });
+        return Response.json({ answer: aiResult.response }, { headers: corsHeaders });
+      } catch (e) {
+        return Response.json({ error: e.message }, { status: 500, headers: corsHeaders });
       }
-
-      if (!Array.isArray(payload.chatMessages)) {
-        return Response.json({error: "缺少chatMessages对话数组参数"}, {status:400, headers:corsHeaders});
-      }
-
-      // 调用轻量模型，降低超时
-      const aiResp = await env.AI.run("@cf/meta/llama-3-8b-instruct-fast", {
-        messages: payload.chatMessages,
-        max_tokens: 200
-      });
-
-      return Response.json({answer: aiResp.response}, {headers: corsHeaders});
-    } catch (serverErr) {
-      console.error("服务内部错误：", serverErr);
-      return Response.json({error: "AI推理失败：" + serverErr.message}, {status:500, headers:corsHeaders});
     }
+
+    // 其余所有路径交给静态页面
+    return env.ASSETS.fetch(request);
   }
 };
