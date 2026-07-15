@@ -1,4 +1,5 @@
 name = "ai"
+# 必须存在这一行，指定worker入口
 main = "worker.js"
 compatibility_date = "2026-07-15"
 compatibility_flags = ["nodejs_compat"]
@@ -9,5 +10,6 @@ enabled = true
 [assets]
 directory = "."
 
+# AI内置绑定，不需要token
 [ai]
 binding = "AI"
