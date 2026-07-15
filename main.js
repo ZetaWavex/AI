@@ -30,7 +30,10 @@ async function fetchAI() {
       body: JSON.stringify({ chatMessages: messagesHistory })
     });
 
+    // 打印原始返回，用于判断是HTML还是JSON
     const rawText = await res.text();
+    console.log("后端原始返回：", rawText);
+
     if (!rawText) throw new Error("后端无返回数据");
     const data = JSON.parse(rawText);
 

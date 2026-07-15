@@ -9,6 +9,5 @@ enabled = true
 [assets]
 directory = "."
 
-# 内置AI绑定，无需API Token
 [ai]
 binding = "AI"
