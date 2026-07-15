@@ -26,18 +26,23 @@ async function fetchAI() {
   try {
     const res = await fetch(WORKER_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({ chatMessages: messagesHistory })
     });
 
-    const raw = await res.text();
-    // F12控制台查看打印内容判断问题
-    console.log("后端原始返回文本：", raw);
+    // 读取原始返回文本
+    const rawContent = await res.text();
+    console.log("后端完整返回内容：", rawContent);
 
-    if (!raw.trim()) throw new Error("后端无返回数据");
-    const data = JSON.parse(raw);
+    if (!rawContent.trim()) {
+      throw new Error("后端无返回数据");
+    }
 
+    const data = JSON.parse(rawContent);
     if (data.error) throw new Error(data.error);
+
     messagesHistory.push({ role: "assistant", content: data.answer });
     addMsg(data.answer, false);
   } catch (err) {
@@ -46,4 +51,6 @@ async function fetchAI() {
 }
 
 sendBtn.addEventListener("click", fetchAI);
-input.addEventListener("keydown", e => e.key === "Enter" && fetchAI());
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") fetchAI();
+});
