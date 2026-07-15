@@ -30,12 +30,12 @@ async function fetchAI() {
       body: JSON.stringify({ chatMessages: messagesHistory })
     });
 
-    // 打印原始返回，用于判断是HTML还是JSON
-    const rawText = await res.text();
-    console.log("后端原始返回：", rawText);
+    const raw = await res.text();
+    // F12控制台查看打印内容判断问题
+    console.log("后端原始返回文本：", raw);
 
-    if (!rawText) throw new Error("后端无返回数据");
-    const data = JSON.parse(rawText);
+    if (!raw.trim()) throw new Error("后端无返回数据");
+    const data = JSON.parse(raw);
 
     if (data.error) throw new Error(data.error);
     messagesHistory.push({ role: "assistant", content: data.answer });

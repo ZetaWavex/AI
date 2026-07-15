@@ -8,32 +8,31 @@ export default {
 
     // 跨域预检
     if (request.method === "OPTIONS") {
-      return new Response(null, { headers: corsHeaders });
+      return new Response(JSON.stringify({ok:true}), { headers: corsHeaders });
     }
 
-    // GET 加载网页，POST才走AI逻辑
+    // GET 走静态页面
     if (request.method !== "POST") {
       return env.ASSETS.fetch(request);
     }
 
-    // 提前判断AI绑定是否存在
+    // 检测AI绑定
     if (!env.AI) {
-      return Response.json({ error: "AI绑定缺失，检查wrangler.toml" }, { status: 500, headers: corsHeaders });
+      return Response.json({ error: "AI绑定未配置" }, { status: 500, headers: corsHeaders });
     }
 
     try {
       let body;
       try {
         body = await request.json();
-      } catch {
-        return Response.json({ error: "请求体不是合法JSON" }, { status: 400, headers: corsHeaders });
+      } catch (e) {
+        return Response.json({ error: "请求不是合法JSON" }, { status: 400, headers: corsHeaders });
       }
 
-      if (!Array.isArray(body.chatMessages)) {
-        return Response.json({ error: "缺少chatMessages参数" }, { status: 400, headers: corsHeaders });
+      if (!body.chatMessages || !Array.isArray(body.chatMessages)) {
+        return Response.json({ error: "缺少chatMessages数组" }, { status: 400, headers: corsHeaders });
       }
 
-      // 轻量快速模型，降低超时概率
       const aiResult = await env.AI.run("@cf/meta/llama-3-8b-instruct-fast", {
         messages: body.chatMessages,
         max_tokens: 300
@@ -41,9 +40,9 @@ export default {
 
       return Response.json({ answer: aiResult.response }, { headers: corsHeaders });
     } catch (err) {
-      console.error("AI报错：", err.message);
-      // 所有异常强制返回JSON，绝对不会空白
-      return Response.json({ error: "推理失败：" + err.message }, { status: 500, headers: corsHeaders });
+      console.error("AI错误:", err);
+      // 所有报错一定返回JSON，杜绝空白返回
+      return Response.json({ error: "后端异常: " + err.message }, { status: 500, headers: corsHeaders });
     }
   }
 };
